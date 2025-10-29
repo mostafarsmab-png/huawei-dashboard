@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Huawei FreeBuds SE 2 – Arabic Reviews Dashboard</title>
+<style>
+  :root{
+    --bg:#f6f8fb; --card:#ffffff; --ink:#1f2937; --muted:#6b7280;
+    --brand:#2e75b6; --brand-2:#5b9bd5; --chip:#eef5fc;
+    --shadow:0 6px 24px rgba(16,24,40,.06),0 2px 8px rgba(16,24,40,.04);
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);background:var(--bg);}
+  header{background:linear-gradient(90deg,var(--brand),var(--brand-2));color:#fff;padding:26px 20px;}
+  header .wrap{max-width:1100px;margin:0 auto;}
+  h1{margin:0;font-size:24px;font-weight:700}
+  main{max-width:1100px;margin:22px auto;padding:0 20px}
+  .controls{
+    background:var(--card);padding:16px;border-radius:var(--radius);box-shadow:var(--shadow);
+    display:grid;grid-template-columns:repeat(4,minmax(160px,1fr));gap:12px;align-items:end;
+  }
+  @media(max-width:900px){.controls{grid-template-columns:repeat(2,minmax(160px,1fr));}}
+  label{font-size:13px;color:var(--muted);margin-bottom:6px;display:block}
+  select,button{
+    width:100%;padding:10px 12px;border:1px solid #e5e7eb;border-radius:12px;background:#fff;font-size:14px;outline:none;
+  }
+  button{background:var(--brand);color:#fff;border:0;cursor:pointer;transition:opacity .2s ease}
+  button:hover{opacity:.9}
+  .grid{display:grid;grid-template-columns:repeat(2,minmax(260px,1fr));gap:16px;margin-top:20px}
+  @media(max-width:900px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px}
+  .product{font-weight:700;color:var(--brand);font-size:15px}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .chip{background:var(--chip);color:var(--brand);font-size:12px;padding:6px 10px;border-radius:999px}
+  .pill{font-size:12px;padding:6px 10px;border-radius:999px;background:#f3f4f6;color:#374151}
+  .sentiment-pos{background:#e9fbf4;color:#065f46}
+  .sentiment-neu{background:#fff7ed;color:#7c2d12}
+  .label{font-size:12px;color:var(--muted);margin-top:2px}
+  .arabic{direction:rtl;text-align:right;line-height:1.75;font-size:15px;background:#fafafa;padding:12px;border-radius:12px;border:1px solid #eee}
+  .english{direction:ltr;text-align:left;line-height:1.6;font-size:14px;background:#f9fbff;padding:12px;border-radius:12px;border:1px solid #eaf2fb}
+  a.source{color:var(--brand);text-decoration:none;font-weight:600}
+  a.source:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap"><h1>Huawei FreeBuds SE 2 – Arabic Reviews Dashboard</h1></div>
+</header>
+
+<main>
+  <section class="controls" aria-label="Filters">
+    <div>
+      <label for="platform">Platform</label>
+      <select id="platform"></select>
+    </div>
+    <div>
+      <label for="sentiment">Sentiment</label>
+      <select id="sentiment"></select>
+    </div>
+    <div>
+      <label for="focus">Focus Point</label>
+      <select id="focus"></select>
+    </div>
+    <div><button id="resetBtn">Show All</button></div>
+  </section>
+
+  <section class="grid" id="cards" aria-live="polite"></section>
+</main>
+
+<script>
+(function(){
+  // ---- Data ----
+  var DATA = [
+    {product:"Huawei FreeBuds SE 2",platform:"YouTube",sentiment:"إيجابي",focus:"السعر / القيمة",
+     review_ar:"سماعة رهيبة … خيار اقتصادي جدًا من هواوي.",
+     review_en:"An awesome headset … a very economical option from Huawei. (translation by us)",
+     link:"https://www.youtube.com/watch?v=AzZRcQ7hQmY"},
+    {product:"Huawei FreeBuds SE 2",platform:"YouTube",sentiment:"إيجابي",focus:"البطارية / السعر",
+     review_ar:"أفضل سماعة تحت ‎50$ مع بطارية طويلة جدًا.",
+     review_en:"The best headset under $50 with a very long battery life. (translation by us)",
+     link:"https://www.youtube.com/watch?v=o1TB2CDxQS8"},
+    {product:"Huawei FreeBuds SE 2",platform:"Huawei KSA",sentiment:"إيجابي",focus:"البطارية",
+     review_ar:"بطارية قوية وتدوم طويلًا مع الاستخدام المتواصل.",
+     review_en:"Strong battery which lasts for a long time during continuous use. (translation by us)",
+     link:"https://consumer.huawei.com/sa/headphones/freebuds-se-2/buy/"},
+    {product:"Huawei FreeBuds SE 2",platform:"YouTube",sentiment:"إيجابي",focus:"جودة / سعر",
+     review_ar:"السماعة دي بتعلم صح على كل النقاط: جودة تصنيع، مايك، بطارية… سعر مناسب 139 ريال.",
+     review_en:"This headset nails it on all points: build quality, mic, battery… suitable price SAR 139. (translation by us)",
+     link:"https://www.youtube.com/watch?v=WOYeEMtS7wI"},
+    {product:"Huawei FreeBuds SE 2",platform:"YouTube",sentiment:"إيجابي",focus:"الراحة / التصميم",
+     review_ar:"السماعة تصميمها شيك جداً و مريحة جداً في الأذن … بدون وسادات أذن، مناسبة لناس كتير.",
+     review_en:"The headset has a very sleek design and is very comfortable in the ear… without ear tips, suitable for many people. (translation by us)",
+     link:"https://www.youtube.com/watch?v=kf4juABDD4E"},
+    {product:"Huawei FreeBuds SE 2",platform:"Blog (Dubizzle EG)",sentiment:"إيجابي",focus:"التصميم / الراحة",
+     review_ar:"تصميم بسيط ومريح، ووزنها خفيف… مناسبة لجلسات استماع طويلة.",
+     review_en:"Simple and comfortable design, and its light weight… suitable for long listening sessions. (translation by us)",
+     link:"https://blog.dubizzle.com.eg/ar/"},
+    {product:"Huawei FreeBuds SE 2",platform:"YouTube",sentiment:"إيجابي",focus:"السعر / القيمة",
+     review_ar:"أفضل سماعة لاسلكية؟ تحت سعر 30 دولار!! Huawei FreeBuds SE 2.",
+     review_en:"Best wireless headset? Under $30!! Huawei FreeBuds SE 2. (translation by us)",
+     link:"https://www.youtube.com/watch?v=Q1KS1chzE9k"},
+    {product:"Huawei FreeBuds SE 2",platform:"YouTube",sentiment:"محايد",focus:"المميزات / العيوب",
+     review_ar:"أرخص سماعات هواوي… مراجعة مختصرة لمميزات وعيوب السماعة الاقتصادية.",
+     review_en:"Cheapest Huawei earbuds… a brief review of the budget headset’s pros and cons. (translation by us)",
+     link:"https://www.youtube.com/watch?v=D3i_o55SLQw"}
+  ];
+
+  // ---- Elements ----
+  var elPlatform = document.getElementById('platform');
+  var elSentiment = document.getElementById('sentiment');
+  var elFocus = document.getElementById('focus');
+  var elReset = document.getElementById('resetBtn');
+  var elCards = document.getElementById('cards');
+
+  // ---- Helpers ----
+  function unique(arr){
+    var s = {}, out = [];
+    for (var i=0;i<arr.length;i++){ var v = arr[i]; if (v!=null && v!=="" && !s[v]){ s[v]=1; out.push(v); } }
+    out.sort(function(a,b){ return String(a).localeCompare(String(b)); });
+    return out;
+  }
+  function setOptions(select, allLabel, values){
+    select.innerHTML = "";
+    var optAll = document.createElement("option");
+    optAll.value = "__all";
+    optAll.textContent = allLabel;
+    select.appendChild(optAll);
+    for (var i=0;i<values.length;i++){
+      var o = document.createElement("option");
+      o.value = values[i];
+      o.textContent = values[i];
+      select.appendChild(o);
+    }
+  }
+
+  // Fill dropdowns AFTER data is defined
+  setOptions(elPlatform, "All Platforms", unique(DATA.map(function(x){return x.platform;})));
+  setOptions(elSentiment, "All Sentiments", unique(DATA.map(function(x){return x.sentiment;})));
+  setOptions(elFocus, "All Focus", unique(DATA.map(function(x){return x.focus;})));
+
+  function matches(item){
+    var p = elPlatform.value, s = elSentiment.value, f = elFocus.value;
+    var okP = (p==="__all" || item.platform===p);
+    var okS = (s==="__all" || item.sentiment===s);
+    var okF = (f==="__all" || item.focus===f);
+    return okP && okS && okF;
+  }
+  function sentClass(s){ return s==="إيجابي" ? "pill sentiment-pos" : "pill sentiment-neu"; }
+
+  function render(){
+    elCards.innerHTML = "";
+    var list = DATA.filter(matches);
+    for (var i=0;i<list.length;i++){
+      var x = list[i];
+      var card = document.createElement("article");
+      card.className = "card";
+      card.innerHTML =
+        '<div class="row">'+
+          '<div class="product">'+x.product+'</div>'+
+          '<span class="chip">'+x.platform+'</span>'+
+          '<span class="'+sentClass(x.sentiment)+'">'+(x.sentiment==="إيجابي"?"Positive":"Neutral")+'</span>'+
+          '<span class="pill">'+x.focus+'</span>'+
+        '</div>'+
+        '<div class="label">Arabic review</div>'+
+        '<div class="arabic">'+x.review_ar+'</div>'+
+        '<div class="label">English translation</div>'+
+        '<div class="english">'+x.review_en+'</div>'+
+        '<a class="source" href="'+x.link+'" target="_blank" rel="noopener">Source link</a>';
+      elCards.appendChild(card);
+    }
+  }
+
+  elPlatform.addEventListener("change", render);
+  elSentiment.addEventListener("change", render);
+  elFocus.addEventListener("change", render);
+  elReset.addEventListener("click", function(){
+    elPlatform.value="__all"; elSentiment.value="__all"; elFocus.value="__all"; render();
+  });
+
+  // Initial draw
+  render();
+})();
+</script>
+</body>
+</html>
